@@ -82,7 +82,7 @@ class LongLiteralTest {
         val hint = backendType.hints
         val modelProvider = new PatternBasedMatchSetModelProvider(hint)
         
-        val patterns = PatternParsingUtil.parseQueryDefinitions('''
+        val patterns = PatternParsingUtil.parsePatterns('''
             package test
             import "http://org.eclipse.viatra/model/cps"        
 
@@ -94,7 +94,7 @@ class LongLiteralTest {
                 ApplicationType.exeFileSize(appT, value);
                 check(value == 0l);
             }        
-        ''', injector)
+        ''')
         
         val equalityMatchSet = modelProvider.getMatchSetRecord(rs, patterns.findFirst[it.fullyQualifiedName == "test.longValueConstant"] as IQuerySpecification<? extends ViatraQueryMatcher<IPatternMatch>>, null)
         val withCheckMatchSet = modelProvider.getMatchSetRecord(rs, patterns.findFirst[it.fullyQualifiedName == "test.longValueConstantWithCheck"] as IQuerySpecification<? extends ViatraQueryMatcher<IPatternMatch>>, null)
