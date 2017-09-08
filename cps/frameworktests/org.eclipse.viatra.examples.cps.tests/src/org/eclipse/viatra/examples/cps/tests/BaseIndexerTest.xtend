@@ -36,6 +36,9 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameter
 import org.junit.runners.Parameterized.Parameters
+import org.eclipse.viatra.query.runtime.base.api.NavigationHelper
+import org.eclipse.viatra.query.runtime.base.api.BaseIndexOptions
+import org.eclipse.viatra.query.runtime.base.exception.ViatraBaseException
 
 @RunWith(Parameterized)
 class BaseIndexerTest {
@@ -62,16 +65,20 @@ class BaseIndexerTest {
     
     @Parameter(0)
     public ENamedElement element
+    
     @Parameter(1)
     public String modelPath
-    ResourceSet rs
     
+    protected ResourceSet rs
+    
+    protected BaseIndexOptions options
     
     @Before
     def void prepareTest() {
         val modelUri = XmiModelUtil::resolvePlatformURI(XmiModelUtilRunningOptionEnum.BOTH, modelPath)
         rs = new ResourceSetImpl
         rs.getResource(modelUri, true)
+        options = new BaseIndexOptions
     }
     
     def collectSettings(List<Object> list, EObject eobject, EStructuralFeature feature) {
@@ -117,7 +124,7 @@ class BaseIndexerTest {
     
     @Test
     def void testWildCardStatistics(){
-        val baseIndex = ViatraBaseFactory::instance.createNavigationHelper(rs, false, null)
+        val baseIndex = createBaseIndex(options.withWildcardLevel(IndexingLevel.NONE))
         baseIndex.wildcardLevel = IndexingLevel.STATISTICS
         val expected = enumerateInstances(element).size
         var counted = -1;
@@ -136,7 +143,7 @@ class BaseIndexerTest {
     
     @Test
     def void testStatistics(){
-        val baseIndex = ViatraBaseFactory::instance.createNavigationHelper(rs, false, null)
+        val baseIndex = createBaseIndex(options.withWildcardLevel(IndexingLevel.NONE))
         val expected = enumerateInstances(element).size
         var counted = -1;
         if (element instanceof EClass){
@@ -157,7 +164,7 @@ class BaseIndexerTest {
     
     @Test
     def void testStatisticsInFull(){
-        val baseIndex = ViatraBaseFactory::instance.createNavigationHelper(rs, false, null)
+        val baseIndex = createBaseIndex(options.withWildcardLevel(IndexingLevel.NONE))
         val expected = enumerateInstances(element).size
         var counted = -1;
         if (element instanceof EClass){
@@ -178,7 +185,7 @@ class BaseIndexerTest {
     
     @Test
     def void testWildcardFullWithOptions(){
-        val baseIndex = ViatraBaseFactory::instance.createNavigationHelper(rs, true, null)
+        val baseIndex = createBaseIndex(options.withWildcardLevel(IndexingLevel.FULL))
         val expected = enumerateInstances(element)
         if (element instanceof EClass){
             val instances = baseIndex.getAllInstances(element)
@@ -215,7 +222,7 @@ class BaseIndexerTest {
     
     @Test
     def void testWildcardFull(){
-        val baseIndex = ViatraBaseFactory::instance.createNavigationHelper(rs, false, null)
+        val baseIndex = createBaseIndex(options.withWildcardLevel(IndexingLevel.NONE))
         baseIndex.wildcardLevel = IndexingLevel.FULL
         val expected = enumerateInstances(element)
         if (element instanceof EClass){
@@ -253,7 +260,7 @@ class BaseIndexerTest {
     
     @Test
     def void testFull(){
-        val baseIndex = ViatraBaseFactory::instance.createNavigationHelper(rs, false, null)
+        val baseIndex = createBaseIndex(options.withWildcardLevel(IndexingLevel.NONE))
         val expected = enumerateInstances(element)
         if (element instanceof EClass){
             baseIndex.registerEClasses(#{element}, IndexingLevel.FULL)
@@ -293,7 +300,7 @@ class BaseIndexerTest {
     
     @Test
     def void testStatisticsInCallback(){
-        val baseIndex = ViatraBaseFactory::instance.createNavigationHelper(rs, false, null)
+        val baseIndex = createBaseIndex(options.withWildcardLevel(IndexingLevel.NONE))
         val int[] counted = #[-1];
         
         baseIndex.coalesceTraversals([
@@ -324,4 +331,8 @@ class BaseIndexerTest {
         Assert.assertEquals(expected, counted.get(0))
     }
     
+    protected def NavigationHelper createBaseIndex(BaseIndexOptions options) throws ViatraBaseException {
+        return ViatraBaseFactory::instance.createNavigationHelper(rs, options, null)
+    }
+       
 }

@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: CPS Based Tests
 Bundle-SymbolicName: org.eclipse.viatra.examples.cps.tests;singleton:=true
 Bundle-Version: 0.0.1.qualifier
-Export-Package: org.eclipse.viatra.examples.cps.tests.queries,
+Export-Package: org.eclipse.viatra.examples.cps.tests,
+ org.eclipse.viatra.examples.cps.tests.queries,
  org.eclipse.viatra.examples.cps.tests.queries.util
 Require-Bundle: org.eclipse.viatra.query.testing.core;bundle-version="1.2.0",
  com.google.guava,
